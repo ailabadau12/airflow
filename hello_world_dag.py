@@ -20,7 +20,7 @@ with DAG(
     description='DAG in Hello World mỗi 10 giây',
     default_args=default_args,
     start_date=datetime(2025, 5, 29),
-    schedule=None,  # Lặp lại mỗi 10s
+    schedule=timedelta(seconds=100),
     catchup=False,  # Không chạy backlog
     tags=['example'],
 ) as dag:
