@@ -10,7 +10,7 @@ logging.basicConfig(
     format='%(asctime)s [%(levelname)s] %(message)s'
 )
 
-jar_path = "/jar/demo-0.0.1-SNAPSHOT.jar"
+jar_path = "/opt/bitnami/airflow/dags/demo-0.0.1-SNAPSHOT.jar"
 cmd = ['java', '-jar', jar_path]  # Đơn giản hóa lệnh như bạn muốn
 
 def run_jar():
