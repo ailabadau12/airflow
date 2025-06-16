@@ -15,7 +15,7 @@ with DAG(
         name='run-java-image',
         namespace='airflow',  # đổi nếu namespace khác
         image='ailabadau/dag:0.0.1',  # image Java đã build sẵn
-        service_account_name="airflow-sa"
+        service_account_name="airflow-sa",
         # Nếu image cần CMD riêng thì thêm dòng dưới:
         cmds=["java", "-jar", "/app/demo.jar"],
         get_logs=True,
