@@ -17,7 +17,7 @@ with DAG(
         image='ailabadau/dag:0.0.1',  # image Java đã build sẵn
         service_account_name="airflow-sa",
         # Nếu image cần CMD riêng thì thêm dòng dưới:
-        cmds=["java", "-jar", "/app/demo.jar"],
+        #cmds=["java", "-jar", "/app/demo.jar"],
         get_logs=True,
         is_delete_operator_pod=True,
         in_cluster=True,
