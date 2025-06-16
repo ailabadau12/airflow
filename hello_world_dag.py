@@ -13,7 +13,7 @@ with DAG(
     run_jar_task = KubernetesPodOperator(
         task_id='run_java_image_task',
         name='run-java-image',
-        namespace='airflow',  # đổi nếu namespace khác
+        namespace='default',  # đổi nếu namespace khác
         image='ailabadau/dag:0.0.1',  # image Java đã build sẵn
         service_account_name="airflow-sa",
         # Nếu image cần CMD riêng thì thêm dòng dưới:
