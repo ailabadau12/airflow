@@ -1,34 +1,24 @@
 from airflow import DAG
-from airflow.operators.python import PythonOperator
-from datetime import datetime, timedelta
-import logging
+from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
+from datetime import datetime
 
-def print_hello():
-    logging.info("Hello World – Xin chào thế giới")
-    logging.warn("Hello World – Xin chào mọi người")
-
-# Cấu hình mặc định cho DAG
-default_args = {
-    'owner': 'airflow',
-    'retries': 0,
-    'retry_delay': timedelta(seconds=5),
-}
-
-# Khởi tạo DAG
 with DAG(
-    dag_id='hello_world_every_10s',
-    description='DAG in Hello World mỗi 10 giây',
-    default_args=default_args,
-    start_date=datetime(2025, 5, 29),
-    schedule=timedelta(seconds=100),
-    catchup=False,  # Không chạy backlog
-    tags=['example'],
+    dag_id='run_java_image_k8s_dag',
+    start_date=datetime(2025, 1, 1),
+    schedule=None,
+    catchup=False,
+    tags=['java', 'kubernetes'],
 ) as dag:
 
-    # Task duy nhất
-    hello_task = PythonOperator(
-        task_id='print_hello',
-        python_callable=print_hello,
+    run_jar_task = KubernetesPodOperator(
+        task_id='run_java_image_task',
+        name='run-java-image',
+        namespace='airflow',  # đổi nếu namespace khác
+        image='ailabadau/dag:0.0.1',  # image Java đã build sẵn
+        # Nếu image cần CMD riêng thì thêm dòng dưới:
+        cmds=["java", "-jar", "/app/demo.jar"],
+        get_logs=True,
+        is_delete_operator_pod=True,
+        in_cluster=True,
+        startup_timeout_seconds=300,
     )
-
-    hello_task  # Chạy task này
