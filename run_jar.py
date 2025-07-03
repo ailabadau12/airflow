@@ -29,7 +29,7 @@ with DAG(
         image_pull_policy="Always",
 
         get_logs=True,
-        on_finish_action="delete_pod"
+        on_finish_action="delete_pod",
         in_cluster=True,
         startup_timeout_seconds=300,
         execution_timeout=timedelta(minutes=3),
