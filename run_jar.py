@@ -1,60 +1,37 @@
 from airflow import DAG
-from airflow.operators.python import PythonOperator
+from airflow.providers.cncf.kubernetes.operators.pod import KubernetesPodOperator
+from kubernetes.client import models as k8s
+from airflow.models import Variable
 from datetime import datetime
+from datetime import timedelta
 import logging
-import subprocess
-import threading
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s'
-)
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
-jar_path = "/opt/bitnami/airflow/dags/demo-0.0.1-SNAPSHOT.jar"
-cmd = ['java', '-jar', jar_path]  # Đơn giản hóa lệnh như bạn muốn
-
-def run_jar():
-    logging.info(f"Đang khởi động JAR: {jar_path}")
-    process = subprocess.Popen(
-        cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        bufsize=1
-    )
-
-    def stream_output(stream, prefix):
-        for line in iter(stream.readline, ''):
-            if line:
-                logging.info(f"{prefix} {line.strip()}")
-
-    stdout_thread = threading.Thread(target=stream_output, args=(process.stdout, "[JAR STDOUT]"))
-    stderr_thread = threading.Thread(target=stream_output, args=(process.stderr, "[JAR STDERR]"))
-
-    stdout_thread.start()
-    stderr_thread.start()
-
-    # Chờ tiến trình kết thúc
-    process.wait()
-
-    # Đảm bảo đọc hết output
-    stdout_thread.join()
-    stderr_thread.join()
-
-    if process.returncode == 0:
-        logging.info("JAR đã chạy thành công")
-    else:
-        logging.error(f"JAR kết thúc với mã lỗi {process.returncode}")
-
+#user_defined_schedule = Variable.get("dag_schedule", default_var="2 * * * *")     
 with DAG(
-    dag_id='run_java_jar_dag',
-    start_date=datetime(2023, 1, 1),
-    schedule=None,
-    catchup=False,
-    tags=['java', 'jar'],
-) as dag:
+    dag_id='run_java_2',
+    start_date=datetime(2025, 1, 1),
+    schedule=None,  # 
+    catchup=False, # 
+    max_active_runs=1,  # Ensures that only one DAG run is allowed to be active at a time; next runs are skipped or queued
+    tags=['java', 'kubernetes'],
+) as dag:    
+    run_jar_task = KubernetesPodOperator(
+        task_id='marcus-task-2',
+        name='run-java-2',
+        namespace='default',  # 
+        #image='192.168.117.185:8083/java/spring-batch/spring-batch-payment-central/spring-batch-pmc-domestic-transfer:1.0.0-develop',  #
+        image="ailabadau/demo-java:latest",
+        
 
-    run_jar_task = PythonOperator(
-        task_id='run_jar_task',
-        python_callable=run_jar,
+        image_pull_policy="Always",
+
+        get_logs=True,
+        is_delete_operator_pod=True,
+        in_cluster=True,
+        startup_timeout_seconds=300,
+        execution_timeout=timedelta(minutes=3),
+        #pool="pool-test",
     )
