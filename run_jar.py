@@ -4,6 +4,7 @@ from kubernetes.client import models as k8s
 from airflow.models import Variable
 from datetime import datetime
 from datetime import timedelta
+from custom_operator import CustomKubernetesPodOperator
 import logging
 
 logger = logging.getLogger(__name__)
@@ -18,7 +19,7 @@ with DAG(
     max_active_runs=1,  # Ensures that only one DAG run is allowed to be active at a time; next runs are skipped or queued
     tags=['java', 'kubernetes'],
 ) as dag:    
-    run_jar_task = KubernetesPodOperator(
+     run_jar_task = CustomKubernetesPodOperator(
         task_id='marcus-task-2',
         name='run-java-2',
         namespace='default',  # 
