@@ -4,7 +4,7 @@ from kubernetes.client import models as k8s
 from airflow.models import Variable
 from datetime import datetime
 from datetime import timedelta
-from custom_operator import CustomKubernetesPodOperator
+from subclass.custom_operator import CustomKubernetesPodOperator
 import logging
 
 logger = logging.getLogger(__name__)
